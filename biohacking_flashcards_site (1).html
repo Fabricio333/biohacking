@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Self‑Upgrade Arcade</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-emerald-100 to-sky-100 min-h-screen flex flex-col items-center p-6">
+  <h1 class="text-4xl font-extrabold mb-4 text-center">🧠✨ Self‑Upgrade Arcade ✨🧠</h1>
+  <p class="text-lg mb-4 text-gray-700 text-center max-w-xl">Spin up your neurons with quick flashcards, actionable challenges, and a playful to‑do list powered by <span class="font-semibold">science‑backed</span> biohacks.</p>
+
+  <!-- Flashcard Section -->
+  <section id="flashcardSection" class="w-full max-w-md mb-8">
+    <div id="card" class="relative bg-white rounded-2xl shadow-xl p-8 transition-transform duration-500 cursor-pointer">
+      <div id="cardFront" class="text-2xl font-semibold min-h-[120px] flex items-center justify-center text-center"></div>
+      <div id="cardBack" class="hidden text-xl text-teal-700 min-h-[120px] flex items-center justify-center text-center"></div>
+    </div>
+    <div class="flex justify-between mt-4">
+      <button id="prevBtn" class="px-4 py-2 bg-gray-200 rounded-lg shadow hover:shadow-md">← Prev</button>
+      <button id="showBtn" class="px-4 py-2 bg-indigo-500 text-white rounded-lg shadow hover:shadow-md">Show Answer</button>
+      <button id="nextBtn" class="px-4 py-2 bg-gray-200 rounded-lg shadow hover:shadow-md">Next →</button>
+    </div>
+  </section>
+
+  <!-- Actionables Today -->
+  <section class="w-full max-w-md mb-8">
+    <h2 class="text-2xl font-bold mb-2">🎯 Actionables for Today</h2>
+    <ul id="dailyList" class="list-disc pl-6 space-y-1 text-gray-800"></ul>
+    <button id="regenAction" class="mt-2 px-4 py-2 bg-amber-400 rounded-lg shadow hover:shadow-md">New Challenges 🔄</button>
+  </section>
+
+  <!-- To‑Do List -->
+  <section class="w-full max-w-md mb-8">
+    <h2 class="text-2xl font-bold mb-2">📋 Your To‑Do List</h2>
+    <div class="flex mb-2">
+      <input id="todoInput" type="text" placeholder="Add task…" class="flex-1 px-3 py-2 border rounded-l-lg focus:outline-none">
+      <button id="addTodo" class="px-4 py-2 bg-emerald-500 text-white rounded-r-lg">Add ➕</button>
+    </div>
+    <ul id="todoList" class="space-y-1"></ul>
+  </section>
+
+  <footer class="text-sm text-gray-500 mt-auto">
+    Made with ☕️, 🧠, and a dash of dopamine.
+  </footer>
+
+<script>
+const cards = [
+  {q:"Why is morning 🌞 important?", a:"Boosts circadian rhythm, cortisol & dopamine. Get 5–10 min outside within 30 min of waking."},
+  {q:"What breathing hack chills you fast?", a:"Physiological sigh 😮‍💨: two nasal inhales + one slow mouth exhale."},
+  {q:"Minutes of exercise to spark 🧠 plasticity?", a:"~30 min moderate cardio → extra BDNF for learning."},
+  {q:"A 90‑minute ultradian rhythm is perfect for…?", a:"Deep focus sprint; then take a refreshing break."},
+  {q:"Best evening habit for sweet dreams?", a:"Dim lights & screens 2 h before bed 😴."},
+  {q:"Cold‑plunge gold standard?", a:"11 min/week total, split into 2–3 sessions."},
+  {q:"Which amino acid aids focus when fasting?", a:"Tyrosine 500‑1000 mg = dopamine boost."},
+  {q:"What's the 2‑minute rule?", a:"If a task takes <2 min, just do it now 🏃."},
+  {q:"Pomodoro length, neuroscience style?", a:"25 min focus + 5 min break, repeat 🍅."},
+  {q:"Why keep a gratitude journal?", a:"Trains serotonin circuits & happiness bias 🙏."}
+];
+
+let cardIndex = 0;
+const cardFront = document.getElementById('cardFront');
+const cardBack = document.getElementById('cardBack');
+const card = document.getElementById('card');
+function renderCard() {
+  cardFront.textContent = cards[cardIndex].q;
+  cardBack.textContent = cards[cardIndex].a;
+  cardBack.classList.add('hidden');
+  cardFront.classList.remove('hidden');
+  document.getElementById('showBtn').textContent = 'Show Answer';
+}
+renderCard();
+
+document.getElementById('nextBtn').addEventListener('click',()=>{
+  cardIndex = (cardIndex+1)%cards.length;
+  renderCard();
+});
+document.getElementById('prevBtn').addEventListener('click',()=>{
+  cardIndex = (cardIndex-1+cards.length)%cards.length;
+  renderCard();
+});
+document.getElementById('showBtn').addEventListener('click',()=>{
+  cardFront.classList.toggle('hidden');
+  cardBack.classList.toggle('hidden');
+  const btn = document.getElementById('showBtn');
+  btn.textContent = btn.textContent==='Show Answer' ? 'Hide Answer' : 'Show Answer';
+});
+
+// Daily actionables
+const actionables = [
+  "🐧 Do a 2‑min cold shower finish.",
+  "🌳 Walk 10 min outside after lunch.",
+  "📵 Put phone in 🚫‑dopamine box for 1 h of deep work.",
+  "😮‍💨 Do 5 physiological sighs before next stressful task.",
+  "📝 Write 3 things you’re grateful for.",
+  "💧 Drink 500 ml water with pinch of salt & lemon.",
+  "🧘‍♂️ 5‑min box breathing break.",
+  "🏋️‍♂️ Do 20 air squats every 90 min sitting.",
+  "💤 Set an alarm 1 h before bedtime to start wind‑down.",
+  "👀 20‑20‑20 rule: every 20 min, look 20 ft away for 20 s."
+];
+function pickActionables(){
+  const shuffled=[...actionables].sort(()=>0.5-Math.random());
+  return shuffled.slice(0,3);
+}
+function renderDaily(){
+  const list=document.getElementById('dailyList');
+  list.innerHTML='';
+  pickActionables().forEach(act=>{
+    const li=document.createElement('li');
+    li.textContent=act;
+    list.appendChild(li);
+  });
+}
+renderDaily();
+document.getElementById('regenAction').addEventListener('click',renderDaily);
+
+// To‑Do list with localStorage
+const todoKey='bioTodoList';
+function loadTodos(){
+  return JSON.parse(localStorage.getItem(todoKey))||[];
+}
+function saveTodos(todos){
+  localStorage.setItem(todoKey,JSON.stringify(todos));
+}
+function renderTodos(){
+  const todos=loadTodos();
+  const list=document.getElementById('todoList');
+  list.innerHTML='';
+  todos.forEach((t,i)=>{
+    const li=document.createElement('li');
+    li.className='flex items-center bg-white p-2 rounded-lg shadow';
+    const cb=document.createElement('input');
+    cb.type='checkbox';
+    cb.checked=t.done;
+    cb.className='mr-2 h-4 w-4';
+    cb.addEventListener('change',()=>{
+      todos[i].done=cb.checked;
+      saveTodos(todos);
+      renderTodos();
+    });
+    const span=document.createElement('span');
+    span.textContent=t.text;
+    if(t.done){span.classList.add('line-through','text-gray-400');}
+    const del=document.createElement('button');
+    del.textContent='🗑️';
+    del.className='ml-auto';
+    del.addEventListener('click',()=>{
+      todos.splice(i,1);
+      saveTodos(todos);
+      renderTodos();
+    });
+    li.append(cb,span,del);
+    list.appendChild(li);
+  });
+}
+renderTodos();
+document.getElementById('addTodo').addEventListener('click',()=>{
+  const input=document.getElementById('todoInput');
+  const text=input.value.trim();
+  if(!text)return;
+  const todos=loadTodos();
+  todos.push({text,done:false});
+  saveTodos(todos);
+  input.value='';
+  renderTodos();
+});
+</script>
+</body>
+</html>
